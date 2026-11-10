@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 2: Your budget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1c1a;--mute:#6b6a64;--line:#dcd9cf;--accent:#8a3b12;--ok:#1f6b3a;--bad:#9b2226;--card:#f2efe7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .4rem;color:var(--accent)}
+.meta{color:var(--mute);font-size:.9rem;font-family:system-ui,sans-serif}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.97rem}
+.scroll{overflow-x:auto}
+pre.mermaid{background:none;text-align:center;margin:1rem 0}
+.q{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}
+.q p{margin:.2rem 0 .6rem;font-weight:bold}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .8rem;margin:.35rem 0;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--bg))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--bg))}
+.fb{font-size:.9rem;color:var(--mute);margin:.3rem 0 0;min-height:1.2rem}
+#score{font-family:system-ui,sans-serif;font-weight:bold}
+</style>
+</head>
+<body>
+<main>
+<div class="meta"><a href="../index.html">Course index</a> · Agentic engineering · Lesson 2 · ~12 minutes · builds on <a href="0001-the-context-budget.html">Lesson 1: the context budget</a></div>
+<h1>Your budget: attention and skill</h1>
+<p class="meta">Lesson 1: an agent’s attention is finite, so you manage its context. Now the mirror image: your own attention and skill are finite too, and the way you use the agent decides whether they grow or shrink.</p>
+
+<h2>1. The finding</h2>
+<p>In Anthropic’s <a href="https://www.anthropic.com/research/AI-assistance-coding-skills">randomized trial</a>, 52 mostly junior engineers learned an unfamiliar Python library (Trio), with or without an AI assistant, then took a quiz on what they had just used. The AI group averaged 50% against 67% for the hand-coders. The AI group was only about two minutes faster, and that speed difference wasn’t statistically significant.</p>
+<p>The largest gap was on <strong>debugging</strong> questions. That matters for our mission: debugging and code reading are the skills you use to review what an agent wrote. The lesson-1 lever “verify” only works if a human can still judge the result.</p>
+
+<h2>2. It depends on how you use it</h2>
+<p>The researchers grouped participants by interaction style. The dividing line was who did the thinking.</p>
+<pre class="mermaid">
+flowchart TB
+  S["You + AI, unfamiliar code"] --> W{"Who does the thinking?"}
+  W -->|"AI does"| L["Low: 24 to 39% quiz"]
+  W -->|"You do"| H["High: 65 to 86% quiz"]
+  L --> L1["Delegation 39%"]
+  L --> L2["Progressive reliance 35%"]
+  L --> L3["Iterative AI debugging 24%"]
+  H --> H1["Generation then comprehension 86%"]
+  H --> H2["Hybrid code and explanation 68%"]
+  H --> H3["Conceptual inquiry 65%"]
+</pre>
+<p>Two details to notice. First, <em>generation-then-comprehension</em> looked nearly the same as pure delegation except that these people asked follow-up questions to check their own understanding afterwards. Second, <em>conceptual inquiry</em> (asking only conceptual questions, then writing the code yourself) was the fastest high-scoring pattern and second fastest overall. Understanding wasn’t a tax on speed here. Note that the “iterative AI debugging” group used AI to fix errors rather than to understand them, and finished slowest with the lowest score.</p>
+
+<h2>3. How far to trust this</h2>
+<div class="card">
+<strong>Small:</strong> 52 people, and each interaction pattern had only 2 to 7 of them.<br>
+<strong>Associative:</strong> the authors say the patterns are not shown to cause the scores.<br>
+<strong>Short horizon:</strong> a quiz right after the task, on one library, by the vendor of an AI product.<br>
+<strong>Different from agents:</strong> this was a chat sidebar. The authors expect agentic tools like Claude Code to have effects that are likely more pronounced.<br>
+<strong>Learning vs. doing:</strong> Anthropic’s separate study found large speedups on tasks where people already had the skills. The two can both be true.
+</div>
+<p><strong>A working rule (my inference, not the study’s):</strong> in familiar territory, delegate freely and verify. In unfamiliar territory, keep yourself in the loop: ask for explanations, predict before you read, and write the core of the thing yourself. Getting stuck on purpose is part of the cost of learning, as the authors suggest.</p>
+
+<h2>4. Check yourself</h2>
+<p class="meta">Instant feedback. <span id="score"></span></p>
+<div id="quiz"></div>
+
+<h2>Next, and where to read more</h2>
+<p><strong><a href="0003-closing-the-loop.html">Lesson 3</a>:</strong> structuring work so an agent’s output is small and checkable enough for a human to review well, drawing on <a href="https://simonwillison.net/guides/agentic-engineering-patterns/">Willison’s patterns</a> and the Claude Code guidance on plans and verification.</p>
+<p><strong>Primary source:</strong> <a href="https://arxiv.org/abs/2601.20245">Shen and Tamkin, “How AI Impacts Skill Formation”</a> (the full paper behind the post).</p>
+<div class="card">Anything unclear? Ask me in the chat. I can re-explain, test you again, or help you apply this to the tool you use.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js"></script>
+<script>
+try{var dark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;mermaid.initialize({startOnLoad:true,theme:dark?"dark":"neutral"});}catch(e){}
+var Q=[
+{q:"Which skill showed the largest score gap between the AI and hand-coding groups?",
+ o:["Syntax recall","Conceptual theory","Debugging","Code reading"],c:2,
+ e:"Debugging showed the largest gap. It’s also central to reviewing agent output."},
+{q:"Which high-scoring pattern looked almost identical to delegation, apart from one step?",
+ o:["Generating code, then asking follow-up questions about it","Asking only conceptual questions, then coding unaided","Starting with questions, then handing over all coding","Pasting each error to the AI until it passes"],c:0,
+ e:"Right: the added step was using the AI to check their own understanding. The others are low-scoring or a different pattern."},
+{q:"Which is a fair limit on what this study shows?",
+ o:["It tested only senior engineers over several years","It showed AI users finished far faster than controls","It proved the interaction patterns caused the scores","Small groups, one library, and an immediate quiz only"],c:3,
+ e:"Right: small clusters, one library, a short-horizon quiz, and the authors call the pattern link associative."}
+];
+var done=0,right=0,box=document.getElementById("quiz");
+Q.forEach(function(it,i){
+ var d=document.createElement("div");d.className="q";
+ var p=document.createElement("p");p.textContent=(i+1)+". "+it.q;d.appendChild(p);
+ var fb=document.createElement("div");fb.className="fb";
+ var btns=[];
+ it.o.forEach(function(t,j){
+  var b=document.createElement("button");b.className="opt";b.textContent=t;
+  b.onclick=function(){
+   if(d.dataset.done)return;d.dataset.done=1;done++;
+   if(j===it.c){b.classList.add("ok");right++;fb.textContent="Correct. "+it.e;}
+   else{b.classList.add("no");btns[it.c].classList.add("ok");fb.textContent="Not quite. "+it.e;}
+   document.getElementById("score").textContent="Score: "+right+" / "+done;
+  };
+  btns.push(b);d.appendChild(b);
+ });
+ d.appendChild(fb);box.appendChild(d);
+});
+</script>
+</body>
+</html>

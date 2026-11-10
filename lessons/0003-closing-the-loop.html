@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 3: Closing the loop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1c1a;--mute:#6b6a64;--line:#dcd9cf;--accent:#8a3b12;--ok:#1f6b3a;--bad:#9b2226;--card:#f2efe7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .4rem;color:var(--accent)}
+.meta{color:var(--mute);font-size:.9rem;font-family:system-ui,sans-serif}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.97rem}
+.scroll{overflow-x:auto}
+pre.mermaid{background:none;text-align:center;margin:1rem 0}
+.q{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}
+.q p{margin:.2rem 0 .6rem;font-weight:bold}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .8rem;margin:.35rem 0;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--bg))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--bg))}
+.fb{font-size:.9rem;color:var(--mute);margin:.3rem 0 0;min-height:1.2rem}
+#score{font-family:system-ui,sans-serif;font-weight:bold}
+</style>
+</head>
+<body>
+<main>
+<div class="meta"><a href="../index.html">Course index</a> · Agentic engineering · Lesson 3 · ~12 minutes · builds on <a href="0001-the-context-budget.html">Lesson 1</a> and <a href="0002-your-budget.html">Lesson 2</a></div>
+<h1>Closing the loop: verification you can trust</h1>
+<p class="meta">You told me your habit with Claude Code: run it, see it roughly works, accept. This lesson is about replacing “roughly works” with something stronger, without turning you into a full-time reviewer.</p>
+
+<h2>1. Why “it looks done” isn’t enough</h2>
+<p>The <a href="https://code.claude.com/docs/en/best-practices">Claude Code best-practices guide</a> puts it plainly: Claude stops when the work looks done. If it has no check it can run, “looks done” is its only signal, and <em>you</em> become the verification loop, so every mistake waits for you to notice it. The guide lists this as a named failure, the trust-then-verify gap, with the fix: always provide verification, and if you can’t verify it, don’t ship it.</p>
+<p>Connect it to lesson 2: debugging and code reading were where the skill gap showed up. A superficial check leans on exactly the skills that are weakest when you delegate everything. Better automated checks protect you from that.</p>
+
+<h2>2. Three layers of verification</h2>
+<pre class="mermaid">
+flowchart LR
+  A["Spec or plan: files, out of scope, end-to-end check"] --> B["Agent implements"]
+  B --> C["Self-check: tests, build, curl, screenshot"]
+  C -->|fail| B
+  C -->|pass, with evidence| D["Fresh-context review of the diff"]
+  D --> E["You: read the evidence and diff, run it once"]
+  E --> F["Commit"]
+</pre>
+<div class="card">
+<strong>Layer 1, the agent checks itself.</strong> Give it something that returns pass or fail: tests, a build exit code, a linter, a screenshot to compare. Willison adds that passing tests don’t prove the code works as intended, so also have the agent exercise it for real (<code>curl</code> for APIs, browser automation such as Playwright for UIs) and fold any bugs it finds back into permanent tests.<br>
+<strong>Layer 2, evidence, not assertions.</strong> Ask it to show the command it ran and what came back. Claude Code’s guide notes that reviewing evidence is faster than re-running verification yourself. Willison’s Showboat tool records commands together with their real output to discourage an agent from writing what it <em>hoped</em> happened.<br>
+<strong>Layer 3, fresh eyes.</strong> A reviewer in a new context (a subagent or second session) sees only the diff and your criteria, not the reasoning that produced it. Caveat from the same guide: a reviewer asked for gaps will usually report some, so tell it to flag only correctness or stated-requirement gaps, or you’ll chase over-engineering.
+</div>
+<p>The guide also lets you choose how hard a check gates the work: in one prompt, across a session with a goal condition, or as a deterministic Stop hook that blocks finishing until the check passes. Start with the prompt version.</p>
+
+<h2>3. Keep the unit of work small enough to review</h2>
+<p>Your attention is the scarce resource from lesson 2, so shrink what lands in front of it. The guide’s flow is explore, plan, implement, commit, using plan mode for the first two. Its own rule of thumb: if you could describe the diff in one sentence, skip the plan. For larger features, have Claude interview you, write a <code>SPEC.md</code>, then start a fresh session to implement it. The best specs name the files and interfaces involved, state what’s out of scope, and end with an end-to-end verification step.</p>
+<p><strong>Honest gap:</strong> I found no solid research on how big a diff a person can review well, so I won’t invent a number. Use the one-sentence test and your own experience of when you start skimming.</p>
+
+<h2>4. Your turn</h2>
+<div class="card">Next feature you give Claude Code, add two lines to the prompt: <em>“Write a failing test first, then make it pass, and exercise the result the way a user would. Show me the commands and output.”</em> Then read the diff for one function you wouldn’t have known how to write, and ask Claude to explain it. That last step is the lesson-2 habit (comprehension after generation).</div>
+
+<h2>5. Check yourself</h2>
+<p class="meta">Instant feedback. <span id="score"></span></p>
+<div id="quiz"></div>
+
+<h2>Next, and where to read more</h2>
+<p><strong>Lesson 4 (coming):</strong> your standing instructions and sessions: a lean CLAUDE.md, hooks vs. advice, when to <code>/clear</code>, and why subagents matter. Back to lesson 1’s budget, now with practice.</p>
+<p><strong>Primary sources:</strong> <a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a> and Willison’s <a href="https://simonwillison.net/guides/agentic-engineering-patterns/agentic-manual-testing/">Agentic manual testing</a>.</p>
+<div class="card">Anything unclear? Ask me in the chat. I can walk through a real task of yours and write the verification lines together.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js"></script>
+<script>
+try{var dark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;mermaid.initialize({startOnLoad:true,theme:dark?"dark":"neutral"});}catch(e){}
+var Q=[
+{q:"Why does the Claude Code guide call “it looks done” a weak signal?",
+ o:["Agents often claim work is finished before they start","Reviewers always disagree with whatever the agent produced","Tests cannot be run until a human has approved the plan","Without a runnable check, you become the only verifier"],c:3,
+ e:"Right: Claude stops when work looks done, so absent a check it can run, every mistake waits for you."},
+{q:"Your test suite passes. What does Willison suggest you still do?",
+ o:["Exercise the feature for real, such as curl or a browser","Rewrite the tests by hand to confirm they are correct","Switch to a larger model and run the suite once more","Skip further checks, since passing tests settle the question"],c:0,
+ e:"Right: tests passing doesn’t prove it works as intended. Real exercise often finds what tests missed."},
+{q:"A reviewer subagent returns ten “gaps” on sound work. Best response?",
+ o:["Fix all ten so the reviewer is fully satisfied","Remove the review step because it wastes time","Ask it to flag only correctness and requirement gaps","Run the review repeatedly until it returns zero gaps"],c:2,
+ e:"Right: reviewers asked for gaps will find some, so scope the prompt or you’ll add needless abstraction and tests."}
+];
+var done=0,right=0,box=document.getElementById("quiz");
+Q.forEach(function(it,i){
+ var d=document.createElement("div");d.className="q";
+ var p=document.createElement("p");p.textContent=(i+1)+". "+it.q;d.appendChild(p);
+ var fb=document.createElement("div");fb.className="fb";
+ var btns=[];
+ it.o.forEach(function(t,j){
+  var b=document.createElement("button");b.className="opt";b.textContent=t;
+  b.onclick=function(){
+   if(d.dataset.done)return;d.dataset.done=1;done++;
+   if(j===it.c){b.classList.add("ok");right++;fb.textContent="Correct. "+it.e;}
+   else{b.classList.add("no");btns[it.c].classList.add("ok");fb.textContent="Not quite. "+it.e;}
+   document.getElementById("score").textContent="Score: "+right+" / "+done;
+  };
+  btns.push(b);d.appendChild(b);
+ });
+ d.appendChild(fb);box.appendChild(d);
+});
+</script>
+</body>
+</html>

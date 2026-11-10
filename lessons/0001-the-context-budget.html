@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 1: The context budget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1c1a;--mute:#6b6a64;--line:#dcd9cf;--accent:#8a3b12;--ok:#1f6b3a;--bad:#9b2226;--card:#f2efe7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .4rem;color:var(--accent)}
+.meta{color:var(--mute);font-size:.9rem;font-family:system-ui,sans-serif}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.97rem}
+.scroll{overflow-x:auto}
+pre.mermaid{background:none;text-align:center;margin:1rem 0}
+.q{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}
+.q p{margin:.2rem 0 .6rem;font-weight:bold}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .8rem;margin:.35rem 0;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--bg))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--bg))}
+.fb{font-size:.9rem;color:var(--mute);margin:.3rem 0 0;min-height:1.2rem}
+#score{font-family:system-ui,sans-serif;font-weight:bold}
+</style>
+</head>
+<body>
+<main>
+<div class="meta"><a href="../index.html">Course index</a> · Agentic engineering · Lesson 1 of the course · ~10 minutes</div>
+<h1>The context budget</h1>
+<p class="meta">Mission: direct coding agents so the output stays reviewable, without losing your own skills. First, the agent’s side of the ledger.</p>
+
+<h2>1. What an agent is</h2>
+<p>A working definition, from <a href="https://simonwillison.net/guides/agentic-engineering-patterns/what-is-agentic-engineering">Simon Willison’s guide</a>: a coding agent is an LLM that can run code and uses tools in a loop until a goal is met. Anthropic uses nearly the same definition for agents in general.</p>
+<pre class="mermaid">
+flowchart LR
+  G[Your goal] --> L[LLM]
+  L -->|tool call| T[Tools: read file, run tests, grep]
+  T -->|output appended| C[(Context)]
+  C --> L
+</pre>
+<p>Look at the arrow into <em>Context</em>. Every file the agent reads and every command output lands in that same window, and the model rereads it all each turn. Nothing leaves unless you or the tool removes it.</p>
+
+<h2>2. The context is a budget, not a bucket</h2>
+<p>Anthropic’s framing: models have a finite <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">attention budget</a>, so the job is to find the smallest set of high-signal tokens that makes the desired outcome likely. Bigger windows don’t remove the problem.</p>
+<p>The evidence: Chroma’s <a href="https://research.trychroma.com/context-rot">Context Rot report</a> tested 18 models and found performance grows less reliable as input length grows, even on simple tasks. Two honest caveats: the tasks are synthetic, and the authors don’t explain the mechanism.</p>
+<p>Anthropic’s own <a href="https://code.claude.com/docs/en/best-practices">Claude Code guidance</a> builds nearly everything on one constraint: the window fills fast and performance degrades as it fills.</p>
+
+<h2>3. Three levers you control</h2>
+<div class="card">
+<strong>Reset.</strong> Clear the session between unrelated tasks so old noise isn’t carried along.<br>
+<strong>Delegate.</strong> Send investigation to a subagent: it explores in its own context and returns a summary, so your main session stays clean.<br>
+<strong>Verify.</strong> Give the agent a check it can run (tests, build, screenshot). Without one, you become the only feedback loop.
+</div>
+<p>A fourth, subtler lever: keep standing instructions lean. An ETH Zurich study of <a href="https://arxiv.org/pdf/2602.11988">AGENTS.md files</a> found they gave no improvement in task success while raising inference cost by over 20%, because agents follow them faithfully, doing extra exploration and testing. Short, non-redundant files are the takeaway, not “never write one.”</p>
+
+<h2>4. Check yourself</h2>
+<p class="meta">Answers give instant feedback. <span id="score"></span></p>
+<div id="quiz"></div>
+
+<h2>Next, and where to read more</h2>
+<p><strong><a href="0002-your-budget.html">Lesson 2</a>:</strong> your budget. Agents have an attention limit, and so do you. We’ll look at Anthropic’s <a href="https://www.anthropic.com/research/AI-assistance-coding-skills">skill-formation trial</a> and how you can use AI without losing the skills that let you review its work.</p>
+<p><strong>Primary source for this lesson:</strong> <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective context engineering for AI agents</a> (Anthropic).</p>
+<div class="card">Anything unclear? Ask me follow-up questions in the chat. I’m your teacher here, and I can re-explain, give another example, or adjust the pace.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js"></script>
+<script>
+try{var dark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;mermaid.initialize({startOnLoad:true,theme:dark?"dark":"neutral"});}catch(e){}
+var Q=[
+{q:"A session is far under the window limit, yet answers get worse as it grows. What is the best explanation?",
+ o:["The model slowly forgets how to write good code","Attention spreads thinner as tokens pile up, diluting signal","The provider lowers output quality in longer sessions","Older messages are silently deleted before every turn"],c:1,
+ e:"Right: finite attention budget, and Chroma saw reliability fall as input grew. The other options describe things that aren’t happening."},
+{q:"The build is failing. Which prompt best follows the official Claude Code guidance?",
+ o:["Say the build is broken and let it investigate","Have it read the whole repository before changing anything","Ask it to fix the failing build as quickly as possible","Paste the exact error and require a passing build as proof"],c:3,
+ e:"Right: a specific symptom plus a check it can run lets the agent verify itself, so you aren’t the only feedback loop."},
+{q:"What did the ETH Zurich AGENTS.md study find about auto-generated context files?",
+ o:["More steps and cost with no real gain in success rates","Higher success rates at a much higher token cost","Best results when they list every project directory","Agents learned to ignore the repository’s own docs"],c:0,
+ e:"Right: agents obeyed the files, doing more work, but success didn’t improve. Directory overviews didn’t speed up finding files either."}
+];
+var done=0,right=0,box=document.getElementById("quiz");
+Q.forEach(function(it,i){
+ var d=document.createElement("div");d.className="q";
+ var p=document.createElement("p");p.textContent=(i+1)+". "+it.q;d.appendChild(p);
+ var fb=document.createElement("div");fb.className="fb";
+ var btns=[];
+ it.o.forEach(function(t,j){
+  var b=document.createElement("button");b.className="opt";b.textContent=t;
+  b.onclick=function(){
+   if(d.dataset.done)return;d.dataset.done=1;done++;
+   if(j===it.c){b.classList.add("ok");right++;fb.textContent="Correct. "+it.e;}
+   else{b.classList.add("no");btns[it.c].classList.add("ok");fb.textContent="Not quite. "+it.e;}
+   document.getElementById("score").textContent="Score: "+right+" / "+done;
+  };
+  btns.push(b);d.appendChild(b);
+ });
+ d.appendChild(fb);box.appendChild(d);
+});
+</script>
+</body>
+</html>

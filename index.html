@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Agentic Engineering: course index</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1c1a;--mute:#6b6a64;--line:#dcd9cf;--accent:#8a3b12;--ok:#1f6b3a;--bad:#9b2226;--card:#f2efe7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .4rem;color:var(--accent)}
+.meta{color:var(--mute);font-size:.9rem;font-family:system-ui,sans-serif}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.97rem}
+.scroll{overflow-x:auto}
+pre.mermaid{background:none;text-align:center;margin:1rem 0}
+.q{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}
+.q p{margin:.2rem 0 .6rem;font-weight:bold}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .8rem;margin:.35rem 0;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--bg))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--bg))}
+.fb{font-size:.9rem;color:var(--mute);margin:.3rem 0 0;min-height:1.2rem}
+#score{font-family:system-ui,sans-serif;font-weight:bold}
+.lesson{display:block;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:.8rem 1rem;margin:.7rem 0;background:var(--card)}.lesson:hover{border-color:var(--accent)}.lesson b{color:var(--accent)}.lesson span{display:block;font-size:.9rem;color:var(--mute);font-family:system-ui,sans-serif}.soon{opacity:.6}li{margin:.3rem 0;font-size:.95rem}</style></head><body><main>
+<div class="meta">A self-paced course</div>
+<h1>Agentic engineering</h1>
+<p>Using LLM coding agents to build web apps and developer tooling without producing slop, and without your own skills atrophying. Taught sequentially: each lesson builds on the last. Lessons use Mermaid diagrams loaded from a CDN, so open them with an internet connection.</p>
+<h2>Mission</h2>
+<ul>
+<li>Explain why agent sessions degrade as context grows, and choose between clearing, compacting, delegating and verifying</li>
+<li>Structure tasks so an agent works in a bounded context and a human can review the result</li>
+<li>Use AI in ways that keep you learning, not only delegating</li>
+<li>Write lean project instruction files and verification loops for your own repos</li>
+</ul>
+<p class="meta">Full text in <a href="MISSION.md">MISSION.md</a>.</p>
+<h2>Lessons</h2>
+<a class="lesson" href="lessons/0001-the-context-budget.html"><b>1. The context budget</b><span>The agent loop, attention as a finite budget, context rot, and three levers: reset, delegate, verify.</span></a>
+<a class="lesson" href="lessons/0002-your-budget.html"><b>2. Your budget: attention and skill</b><span>Anthropic’s skill-formation trial, six ways of using AI, and which ones preserve learning.</span></a>
+<a class="lesson" href="lessons/0003-closing-the-loop.html"><b>3. Closing the loop</b><span>Verification in three layers, evidence over assertions, and keeping work small enough to review.</span></a>
+<div class="lesson soon"><b>4. Standing instructions and sessions (coming)</b><span>Lean CLAUDE.md, hooks vs. advice, when to clear, and subagents in practice.</span></div>
+<h2>Primary sources</h2>
+<ul>
+<li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic: Effective context engineering for AI agents</a></li>
+<li><a href="https://research.trychroma.com/context-rot">Chroma: Context Rot</a></li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code: Best practices</a></li>
+<li><a href="https://simonwillison.net/guides/agentic-engineering-patterns/">Simon Willison: Agentic Engineering Patterns</a></li>
+<li><a href="https://www.anthropic.com/research/AI-assistance-coding-skills">Anthropic: How AI assistance impacts the formation of coding skills</a> (<a href="https://arxiv.org/abs/2601.20245">paper</a>)</li>
+<li><a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR: Early-2025 AI and experienced developer productivity</a></li>
+<li><a href="https://arxiv.org/pdf/2602.11988">Evaluating AGENTS.md</a></li>
+</ul>
+<p class="meta">Annotations and known gaps are in <a href="RESOURCES.md">RESOURCES.md</a>.</p>
+</main></body></html>
