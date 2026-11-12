@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 5: Capstone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1c1a;--mute:#6b6a64;--line:#dcd9cf;--accent:#8a3b12;--ok:#1f6b3a;--bad:#9b2226;--card:#f2efe7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--fg:#ecebe6;--mute:#a09f97;--line:#3a3935;--accent:#e8a070;--ok:#6fcf97;--bad:#f08a8a;--card:#222220;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .4rem;color:var(--accent)}
+.meta{color:var(--mute);font-size:.9rem;font-family:system-ui,sans-serif}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.97rem}
+.scroll{overflow-x:auto}
+pre.mermaid{background:none;text-align:center;margin:1rem 0}
+.q{border-top:1px solid var(--line);padding-top:1rem;margin-top:1rem}
+.q p{margin:.2rem 0 .6rem;font-weight:bold}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .8rem;margin:.35rem 0;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--bg))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--bg))}
+.fb{font-size:.9rem;color:var(--mute);margin:.3rem 0 0;min-height:1.2rem}
+#score{font-family:system-ui,sans-serif;font-weight:bold}
+.prompt{white-space:pre-wrap;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.7rem .9rem;font:.85rem/1.5 ui-monospace,Menlo,monospace;margin:.5rem 0}.btn{font:.85rem system-ui,sans-serif;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.3rem .7rem;cursor:pointer}.btn:hover{border-color:var(--accent)}ul.ck{list-style:none;padding:0}ul.ck li{margin:.4rem 0;font-size:.97rem}textarea{width:100%;box-sizing:border-box;font:.9rem/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.5rem;min-height:4.5rem}label.w{display:block;font-weight:bold;font-size:.92rem;margin:1rem 0 .3rem}</style>
+</head>
+<body>
+<main>
+<div class="meta"><a href="../index.html">Course index</a> · Agentic engineering · Lesson 5 · capstone · ~1 to 2 hours of your own work · builds on <a href="0001-the-context-budget.html">1</a>, <a href="0002-your-budget.html">2</a>, <a href="0003-closing-the-loop.html">3</a> and <a href="0004-standing-instructions-and-sessions.html">4</a></div>
+<h1>Capstone: one real feature, the whole loop</h1>
+<p class="meta">No new theory. You’ll run one real feature through everything so far in Claude Code, then audit what happened. I can’t see your repo, so this is a guided exercise: do it, then bring me your audit and we’ll go through it together.</p>
+<pre class="mermaid">
+flowchart LR
+  P["0. Choose and predict"] --> E["1. Prepare (L4)"]
+  E --> S["2. Spec (L3)"]
+  S --> I["3. Implement and verify (L1, L3)"]
+  I --> R["4. Review and understand (L2, L3)"]
+  R --> A["5. Audit and update (L4)"]
+  A -.->|"improve instructions"| E
+</pre>
+<p class="meta">Your checkboxes are remembered in this browser only.</p>
+
+<h2>0. Choose the feature and make a prediction</h2>
+<ul class="ck">
+<li><label><input type="checkbox" data-k="c1"> Real, and mergeable if it works. Work on a branch.</label></li>
+<li><label><input type="checkbox" data-k="c2"> Roughly 1 to 3 hours by hand, in a codebase where part of it is familiar and part is not (lesson 2: that unfamiliar part is where your skills are at stake).</label></li>
+<li><label><input type="checkbox" data-k="c3"> Can be verified end to end (a request, a page, a command), not just by reading code.</label></li>
+<li><label><input type="checkbox" data-k="c4"> Not something where a mistake is costly in production, such as billing or auth, for a first run.</label></li>
+<li><label><input type="checkbox" data-k="c5"> Written down: how long it would take you alone, and how long with the agent. METR’s trial found developers believed AI sped them up while it measurably slowed them, so check your own estimate against the clock.</label></li>
+</ul>
+
+<h2>1. Prepare (lesson 4)</h2>
+<ul class="ck">
+<li><label><input type="checkbox" data-k="e1"> Run <code>/context</code>; prune CLAUDE.md with the test “would removing this cause mistakes?”</label></li>
+<li><label><input type="checkbox" data-k="e2"> One must-happen-every-time rule (format, lint or test) is a hook, not a sentence.</label></li>
+</ul>
+
+<h2>2. Spec (lesson 3)</h2>
+<p>In plan mode, have Claude interview you instead of guessing:</p>
+<pre class="prompt" id="p1">I want to build: [feature in one or two sentences].
+Interview me in detail about edge cases, tradeoffs and what is out of scope.
+When we are done, write SPEC.md naming the files and interfaces involved, what is
+out of scope, and an end-to-end verification step.</pre>
+<button class="btn" data-copy="p1">Copy prompt</button>
+<ul class="ck">
+<li><label><input type="checkbox" data-k="s1"> You read SPEC.md and edited it. It lists files, out-of-scope items and an end-to-end check.</label></li>
+</ul>
+
+<h2>3. Implement and verify (lessons 1 and 3)</h2>
+<p><code>/clear</code> first so implementation starts fresh with only the spec in context.</p>
+<pre class="prompt" id="p2">Read SPEC.md and implement it. Write a failing test first, then make it pass.
+Then exercise the feature the way a user would (curl or the browser) and show me
+the exact commands and their output. Do not touch files outside the spec.</pre>
+<button class="btn" data-copy="p2">Copy prompt</button>
+<ul class="ck">
+<li><label><input type="checkbox" data-k="i1"> You saw commands and real output, not just a claim that it works.</label></li>
+<li><label><input type="checkbox" data-k="i2"> If you corrected the same issue twice, you cleared and rewrote the prompt rather than arguing.</label></li>
+</ul>
+
+<h2>4. Review and understand (lessons 2 and 3)</h2>
+<p>Before you read the diff, write down how you expect the unfamiliar part to work, then compare. Then review in a fresh session:</p>
+<pre class="prompt" id="p3">Review the diff on this branch against SPEC.md. Flag only correctness bugs and
+places where the spec is not met. Ignore style and optional improvements.</pre>
+<button class="btn" data-copy="p3">Copy prompt</button>
+<pre class="prompt" id="p4">Walk me through [function or file] step by step. Afterwards I will explain it back
+to you; correct me where I am wrong.</pre>
+<button class="btn" data-copy="p4">Copy prompt</button>
+<ul class="ck">
+<li><label><input type="checkbox" data-k="r1"> You ran the feature yourself once.</label></li>
+<li><label><input type="checkbox" data-k="r2"> You picked one piece you couldn’t have written, had it explained, and explained it back.</label></li>
+</ul>
+
+<h2>5. Audit and update</h2>
+<p>This is the point of the capstone. Answer honestly; nothing here is graded.</p>
+<label class="w" for="a1">What did the agent get wrong, and what caught it: tests, evidence, the reviewer, or you?</label><textarea id="a1"></textarea>
+<label class="w" for="a2">Where did a session degrade (lesson 1), and what did you do?</label><textarea id="a2"></textarea>
+<label class="w" for="a3">What could you not have written yourself, and did you understand it afterwards (lesson 2)?</label><textarea id="a3"></textarea>
+<label class="w" for="a4">Predicted vs actual time, alone vs with the agent. Any surprise?</label><textarea id="a4"></textarea>
+<label class="w" for="a5">One change to CLAUDE.md, a hook, or your prompts so the next run goes better (lesson 4)</label><textarea id="a5"></textarea>
+<p><button class="btn" id="cp">Copy audit as Markdown</button> <span class="meta" id="cpmsg"></span></p>
+<div class="card">Bring the audit back to me in this chat. I’ll look for patterns, such as where you were the only verifier or where you accepted something you didn’t understand, and help you turn them into the next habit.</div>
+<p><strong>Where to go next:</strong> repeat the loop on a second feature in less familiar territory, and keep the audit log in the repo. See <a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a> and Willison’s <a href="https://simonwillison.net/guides/agentic-engineering-patterns/">patterns</a> for deeper techniques.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js"></script>
+<script>
+try{var dark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;mermaid.initialize({startOnLoad:true,theme:dark?"dark":"neutral"});}catch(e){}
+function store(f){try{return f()}catch(e){return null}}
+document.querySelectorAll("input[data-k]").forEach(function(c){
+ c.checked=store(function(){return localStorage.getItem("ae5-"+c.dataset.k)})==="1";
+ c.onchange=function(){store(function(){localStorage.setItem("ae5-"+c.dataset.k,c.checked?"1":"0")})};
+});
+["a1","a2","a3","a4","a5"].forEach(function(id){
+ var t=document.getElementById(id);var v=store(function(){return localStorage.getItem("ae5-"+id)});if(v)t.value=v;
+ t.oninput=function(){store(function(){localStorage.setItem("ae5-"+id,t.value)})};
+});
+function copy(text,done){
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,done);return;}
+ var t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(t);done();
+}
+document.querySelectorAll("button[data-copy]").forEach(function(b){
+ b.onclick=function(){var l=b.textContent;copy(document.getElementById(b.dataset.copy).textContent,function(){b.textContent="Copied";setTimeout(function(){b.textContent=l},1200)})};
+});
+document.getElementById("cp").onclick=function(){
+ var q=["What did the agent get wrong, and what caught it?","Where did a session degrade?","What could I not have written myself?","Predicted vs actual time","One change for next time"];
+ var md="# Capstone audit\n\n";
+ ["a1","a2","a3","a4","a5"].forEach(function(id,i){md+="## "+q[i]+"\n"+document.getElementById(id).value+"\n\n"});
+ copy(md,function(){document.getElementById("cpmsg").textContent="Copied"});
+};
+</script>
+</body>
+</html>
